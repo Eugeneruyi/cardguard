@@ -29,12 +29,12 @@ from datetime import timedelta
 from typing import Optional, Protocol
 
 from .challenge import ChallengeError, ChallengeService
-from ..clock import Clock
+from .clock import Clock
 from .models import (AppCredentials, Card, CardStatus, Challenge, ChallengeStatus,
                      Customer, EnableChannel, FraudCase, PendingApproval, PhoneFix,
                      ResponseDecision, RetryGrant, Transaction, UssdCredential)
 from .money import money
-from ..notify import Notifier
+from .notify import Notifier
 from .offline import ChannelVerifier
 from .risk import RiskConfig
 from .store import Store

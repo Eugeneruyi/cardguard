@@ -6,7 +6,7 @@ from typing import Optional
 
 from .challenge import ChallengeError, ChallengeService, sign_response
 from .clock import Clock
-from ..models import Device, PhoneFix, ResponseDecision
+from .models import Device, PhoneFix, ResponseDecision
 from .notify import PushMessage
 
 

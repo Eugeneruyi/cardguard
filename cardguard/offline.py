@@ -22,7 +22,7 @@ from datetime import timedelta
 from typing import Optional, Protocol
 
 from .clock import Clock
-from ..models import (AppCredentials, AuthDecision, Card, CardStatus,
+from .models import (AppCredentials, AuthDecision, Card, CardStatus,
                      EnableChannel, OfflineMode, Transaction)
 from .money import money
 from .notify import Notifier

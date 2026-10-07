@@ -7,7 +7,7 @@ from concurrent.futures import Future
 from datetime import timedelta
 from typing import Optional
 
-from ..clock import Clock
+from .clock import Clock
 from .models import Card, CardStatus, Challenge, Device, FraudCase, Transaction
 
 
