@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CardGuard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{--bg:#eef2f6;--panel:#fff;--ink:#0f1b2d;--mute:#5b6b80;--line:#d3dbe5;--ok:#16825a;--warn:#b27600;--bad:#c93c3c;--accent:#0f1b2d;--onaccent:#fff;--soft:#e4eaf1;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1220;--panel:#121c2e;--ink:#e8eef6;--mute:#8fa0b6;--line:#26344b;--ok:#3ec790;--warn:#e3b341;--bad:#ff7070;--accent:#e8eef6;--onaccent:#0b1220;--soft:#1a2740}}
+:root[data-theme="dark"]{--bg:#0b1220;--panel:#121c2e;--ink:#e8eef6;--mute:#8fa0b6;--line:#26344b;--ok:#3ec790;--warn:#e3b341;--bad:#ff7070;--accent:#e8eef6;--onaccent:#0b1220;--soft:#1a2740}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.5 Sora,system-ui,sans-serif}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:20px 24px;border-bottom:1px solid var(--line)}
+header h1{font-size:20px;margin:0;font-weight:700;letter-spacing:-.01em}
+header p{margin:2px 0 0;color:var(--mute);font-size:13px}
+main{max-width:1120px;margin:0 auto;padding:24px;display:grid;grid-template-columns:1fr 340px;gap:32px}
+@media(max-width:860px){main{grid-template-columns:1fr;padding:16px}}
+h2{font-size:16px;margin:0 0 12px;font-weight:600}
+section{min-width:0}
+.stack{display:flex;flex-direction:column;gap:28px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+label{display:block;font-size:13px;color:var(--mute);margin-bottom:4px}
+select,input{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:9px 10px;width:100%}
+select:focus,input:focus,button:focus-visible{outline:2px solid var(--ok);outline-offset:1px}
+button{font:inherit;font-weight:600;border:0;border-radius:6px;padding:10px 16px;cursor:pointer;background:var(--accent);color:var(--onaccent)}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button.bad{background:var(--bad);color:#fff}
+button.ok{background:var(--ok);color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+.field{flex:1 1 180px}
+.terminal{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:20px}
+.status{margin-top:16px;padding:12px 14px;border-left:4px solid var(--line);background:var(--soft);font-size:14px;min-height:48px}
+.status.ok{border-color:var(--ok)}.status.bad{border-color:var(--bad)}.status.warn{border-color:var(--warn)}
+.card{display:flex;justify-content:space-between;gap:12px;align-items:center;background:var(--accent);color:var(--onaccent);border-radius:12px;padding:18px 20px;max-width:360px}
+.card b{font-size:17px;letter-spacing:.12em}
+.card small{opacity:.7;display:block}
+.switchrow{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.switchrow p{margin:0;color:var(--mute);font-size:13px}
+.tog{width:48px;height:28px;border-radius:14px;background:var(--line);position:relative;padding:0;flex:none}
+.tog::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--panel);transition:transform .2s}
+.tog[aria-checked="true"]{background:var(--ok)}
+.tog[aria-checked="true"]::after{transform:translateX(20px)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;color:var(--mute);font-weight:400;font-size:13px;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.wrap{overflow-x:auto}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600;border:1px solid currentColor}
+.p-ok{color:var(--ok)}.p-bad{color:var(--bad)}.p-warn{color:var(--warn)}
+.phone{width:100%;max-width:340px;margin:0 auto;border:2px solid var(--ink);border-radius:36px;padding:14px 14px 22px;background:var(--panel);position:sticky;top:16px}
+@media(max-width:860px){.phone{position:static}}
+.phone .bar{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);padding:4px 10px 12px}
+.screen{min-height:430px;display:flex;flex-direction:column;gap:12px}
+.idle{margin:auto;text-align:center;color:var(--mute);font-size:14px;padding:0 20px}
+.notice{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--soft)}
+.notice h3{margin:0 0 4px;font-size:15px}
+.loc{display:flex;gap:10px;align-items:center;margin:10px 0}
+.loc svg{flex:none}
+.big{font-size:32px;letter-spacing:.18em;text-align:center;margin:8px 0}
+.count{color:var(--mute);font-size:13px}
+.ussd{background:#0a0f18;color:#cfe9d9;border-radius:10px;padding:14px;white-space:pre-wrap;min-height:150px;font-size:13px;line-height:1.5}
+.sms{border:1px dashed var(--line);border-radius:10px;padding:10px;font-size:13px}
+.sms .mono{font-size:16px}
+.note{font-size:13px;color:var(--mute)}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>CardGuard</h1><p>Every card payment needs the owner's approval, with the location it came from.</p></div>
+  <div class="note" id="clock"></div>
+</header>
+<main>
+  <div class="stack">
+    <section>
+      <h2>Your card</h2>
+      <div class="card"><div><small>Debit card</small><b class="mono">•••• •••• •••• 4417</b></div><div id="cardstate" class="pill" style="color:var(--onaccent)">Active</div></div>
+      <div style="margin-top:8px;max-width:520px">
+        <div class="switchrow"><div><b>Phone offline mode</b><p>Turn on when your phone is off or broken. Payments are approved by USSD instead.</p></div><button class="tog" id="tOff" role="switch" aria-checked="false" aria-label="Phone offline mode"></button></div>
+        <div class="switchrow"><div><b>Freeze card</b><p>Declines every payment until you unfreeze.</p></div><button class="tog" id="tFreeze" role="switch" aria-checked="false" aria-label="Freeze card"></button></div>
+        <div class="switchrow"><div><b>Where your phone is</b><p>CardGuard compares this with where the card is used.</p></div><select id="phoneLoc" style="width:170px" aria-label="Phone location"><option value="6.6018|3.3515">Ikeja, Lagos</option><option value="6.4281|3.4219">Victoria Island, Lagos</option><option value="9.0765|7.4890">Abuja</option><option value="12.0022|8.5920">Kano</option><option value="51.5074|-0.1278">London</option></select></div>
+        <div class="switchrow"><div><b>USSD password</b><p>Set it yourself. You enter it on the USSD menu.</p></div><input id="pw" class="mono" value="2580" maxlength="6" inputmode="numeric" style="width:100px" aria-label="USSD password"></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Merchant terminal</h2>
+      <div class="terminal">
+        <div class="row">
+          <div class="field"><label for="merch">Where is the card used?</label>
+            <select id="merch">
+              <option value="Shoprite, Ikeja|Ikeja, Lagos|6.6018|3.3515">Shoprite, Ikeja (near home)</option>
+              <option value="Chicken Republic, Victoria Island|Victoria Island, Lagos|6.4281|3.4219">Chicken Republic, Victoria Island</option>
+              <option value="POS terminal, Wuse 2|Abuja|9.0765|7.4890">POS terminal, Wuse 2, Abuja</option>
+              <option value="ATM, Sabon Gari|Kano|12.0022|8.5920">ATM, Sabon Gari, Kano</option>
+              <option value="Online store|London, United Kingdom|51.5074|-0.1278|web">Online: shop checkout, London</option><option value="jumia.com.ng|Ikeja, Lagos|6.6018|3.3515|web">Online: jumia.com.ng, Lagos</option><option value="newshop-deals.xyz|Bucharest, Romania|44.4268|26.1025|web">Online: newshop-deals.xyz, Romania</option>
+            </select></div>
+          <div class="field"><label for="amt">Amount (₦)</label><input id="amt" type="number" min="100" value="18500"></div>
+        </div>
+        <div class="row" style="margin-top:14px"><button id="swipe">Swipe card</button></div>
+        <div id="status" class="status">Swipe the card to start a payment.</div>
+        <div id="codeBox" style="display:none;margin-top:14px">
+          <label for="codeIn" id="codeLbl">Approval code from the cardholder</label>
+          <div class="row"><input id="codeIn" class="mono" inputmode="numeric" maxlength="6" style="max-width:180px" placeholder="6 digits"><button id="confirm" class="ok">Confirm payment</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Activity</h2>
+      <div class="wrap"><table><thead><tr><th>Time</th><th>Merchant</th><th>Location</th><th>Amount</th><th>Result</th></tr></thead><tbody id="log"><tr><td colspan="5" class="note">No payments yet. Swipe the card to see activity.</td></tr></tbody></table></div>
+    </section>
+  </div>
+
+  <aside>
+    <div class="phone" aria-label="Cardholder phone">
+      <div class="bar"><span>CardGuard</span><span id="phoneNet">Online</span></div>
+      <div class="screen" id="screen"><div class="idle">No payment waiting. When your card is used, you will see where and how much here.</div></div>
+    </div>
+  </aside>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const state={offline:false,frozen:false,pending:null,log:[],ussd:null,tries:0,timer:null};
+const naira=n=>"₦"+Number(n).toLocaleString("en-NG");
+const rand6=()=>String(Math.floor(100000+Math.random()*900000));
+function km(a,b,c,d){const r=x=>x*Math.PI/180,h=Math.sin(r(c-a)/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(r(d-b)/2)**2;return 12742*Math.asin(Math.sqrt(h))}
+const riskInfo=(d,w)=>w?["Online, IP "+(d<5?"matches your phone":Math.round(d).toLocaleString()+" km from your phone"),d<5?"p-ok":d<100?"p-warn":"p-bad"]:d<5?["With your phone","p-ok"]:[Math.round(d).toLocaleString()+" km from your phone",d<100?"p-warn":"p-bad"];
+const pin='<svg width="22" height="28" viewBox="0 0 22 28" aria-hidden="true"><path d="M11 1C5.5 1 1 5.4 1 10.8 1 18 11 27 11 27s10-9 10-16.2C21 5.4 16.5 1 11 1z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="11" cy="11" r="3.5" fill="currentColor"/></svg>';
+
+function setStatus(msg,kind){const s=$("status");s.className="status "+(kind||"");s.textContent=msg}
+function addLog(p,result,kind){
+  state.log.unshift({t:new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}),m:p.merchant,l:p.loc+" ("+riskInfo(p.dist,p.web)[0].toLowerCase()+")",a:p.amount,result,kind});
+  $("log").innerHTML=state.log.map(r=>`<tr><td>${r.t}</td><td>${r.m}</td><td>${r.l}</td><td>${naira(r.a)}</td><td><span class="pill ${r.kind}">${r.result}</span></td></tr>`).join("");
+}
+function finish(result,kind,msg){
+  const p=state.pending; if(!p)return;
+  clearInterval(state.timer); state.pending=null; state.ussd=null;
+  addLog(p,result,kind); setStatus(msg,kind==="p-ok"?"ok":"bad");
+  $("codeBox").style.display="none"; $("codeIn").value=""; $("swipe").disabled=false;
+  renderPhone();
+}
+function secsLeft(){return Math.max(0,Math.ceil((state.pending.exp-Date.now())/1000))}
+
+$("swipe").onclick=()=>{
+  const [merchant,loc,la,lo,ch]=$("merch").value.split("|"); const [pla,plo]=$("phoneLoc").value.split("|").map(Number); const dist=km(+la,+lo,pla,plo); const amount=Number($("amt").value)||0;
+  if(amount<=0){setStatus("Enter an amount above ₦0.","warn");return}
+  const p={merchant,loc,dist,web:ch==="web",amount,code:rand6(),prompt:rand6(),revealed:false,exp:Date.now()+120000};
+  if(state.frozen){addLog(p,"Declined","p-bad");setStatus("Declined. The card is frozen.","bad");return}
+  state.pending=p; state.tries=0; $("swipe").disabled=true;
+  setStatus(state.offline?"Waiting for the cardholder to approve by USSD.":"Waiting for the cardholder to approve on their phone.","warn");
+  state.timer=setInterval(()=>{ if(!state.pending)return; if(secsLeft()<=0)finish("Expired","p-warn","Expired. No approval within 2 minutes, so the payment was not made."); else tick()},1000);
+  if(state.offline){state.ussd={step:"idle",choice:null,pw:null}} else {$("codeBox").style.display="none"}
+  renderPhone();
+};
+
+$("confirm").onclick=()=>{
+  const p=state.pending; if(!p)return;
+  if($("codeIn").value.trim()===p.code) finish("Approved","p-ok","Approved. "+naira(p.amount)+" paid at "+p.merchant+".");
+  else {state.tries++; if(state.tries>=3){state.frozen=true;syncToggles();finish("Blocked","p-bad","Three wrong codes. The card is now frozen.")} else setStatus("Wrong code. "+(3-state.tries)+" attempts left.","bad")}
+};
+
+function tick(){const c=document.getElementById("cd"); if(c&&state.pending)c.textContent=secsLeft()+"s left"}
+
+function renderPhone(){
+  const sc=$("screen"), p=state.pending;
+  $("phoneNet").textContent=state.offline?"Phone off":"Online";
+  if(!p){sc.innerHTML='<div class="idle">'+(state.offline?"Offline mode is on. Payments will ask for approval by USSD.":"No payment waiting. When your card is used, you will see where and how much here.")+'</div>';return}
+  const [rl,rc]=riskInfo(p.dist,p.web);
+  if(state.offline){ renderUssd(); return }
+  if(!p.revealed){
+    sc.innerHTML=`<div class="notice"><h3>Is this you?</h3>
+      <div>${naira(p.amount)} at ${p.merchant}${p.web?" (online purchase)":""}</div>
+      <div class="loc">${pin}<div><b>${p.web?"Estimated from IP: ":""}${p.loc}</b><br><span class="pill ${rc}">${rl}</span></div></div>${p.web?'<div class="note">Online location is a guess from the internet address and a VPN can hide it. Approve only if you started this purchase.</div>':''}
+      <div class="count" id="cd">${secsLeft()}s left</div></div>
+      <div class="row"><button class="ok" id="yes" style="flex:1">Yes, approve</button><button class="bad" id="no" style="flex:1">No, block it</button></div>`;
+    $("yes").onclick=()=>{p.revealed=true;$("codeBox").style.display="block";setStatus("Cardholder approved. Enter the code they read out.","warn");renderPhone()};
+    $("no").onclick=()=>{state.frozen=true;syncToggles();finish("Blocked","p-bad","Blocked by the cardholder. The card is frozen.")};
+  } else {
+    sc.innerHTML=`<div class="notice"><h3>Approved</h3><div>Give this code to the merchant:</div><div class="big mono">${p.code}</div><div class="count" id="cd">${secsLeft()}s left</div></div>`;
+  }
+}
+
+/* USSD simulator for phone-offline mode */
+function renderUssd(){
+  const p=state.pending,u=state.ussd,sc=$("screen");
+  const smsHtml=`<div class="sms"><div class="note">SMS to the number on your account</div>Prompt code: <span class="mono">${p.prompt}</span><div class="note">${naira(p.amount)} at ${p.merchant}, ${p.loc}</div></div>`;
+  let text,ph="",btn="Send";
+  if(u.step==="idle"){text="Dial the CardGuard code to approve this payment.";ph="*555#"}
+  else if(u.step==="menu"){text="CardGuard\n1. Approve payment\n2. Decline payment";ph="1 or 2"}
+  else if(u.step==="pw"){text="Enter your USSD password";ph="Password"}
+  else if(u.step==="code"){text="Enter the prompt code from the SMS";ph="6 digits"}
+  sc.innerHTML=`${smsHtml}<div class="ussd mono" id="ut">${text}</div><div class="row"><input id="ui" class="mono" placeholder="${ph}" style="flex:1" aria-label="USSD input"><button id="us">${btn}</button></div><div class="count" id="cd">${secsLeft()}s left</div>`;
+  $("us").onclick=()=>{
+    const v=$("ui").value.trim();
+    if(u.step==="idle"){ if(v==="*555#")u.step="menu"; else{$("ut").textContent="Unknown code. Dial *555#.";return} }
+    else if(u.step==="menu"){ if(v==="1")u.step="pw"; else if(v==="2"){state.frozen=false;finish("Declined","p-bad","Declined by the cardholder over USSD.");return} else{$("ut").textContent="Choose 1 or 2.";return} }
+    else if(u.step==="pw"){ if(v===$("pw").value)u.step="code"; else{state.tries++; if(state.tries>=3){state.frozen=true;syncToggles();finish("Blocked","p-bad","Three wrong passwords. The card is now frozen.")}else $("ut").textContent="Wrong password. "+(3-state.tries)+" attempts left.";return} }
+    else if(u.step==="code"){ if(v===p.prompt){finish("Approved","p-ok","Approved over USSD. "+naira(p.amount)+" paid at "+p.merchant+".");return} else{state.tries++; if(state.tries>=3){state.frozen=true;syncToggles();finish("Blocked","p-bad","Three wrong prompt codes. The card is now frozen.")}else $("ut").textContent="Wrong code. "+(3-state.tries)+" attempts left.";return} }
+    renderUssd();
+  };
+  $("ui").focus();
+}
+
+function syncChannel(){const web=$("merch").value.split("|")[4]==="web";$("swipe").textContent=web?"Pay online":"Swipe card";$("codeLbl").textContent=web?"Approval code (the checkout page asks the buyer for this)":"Approval code from the cardholder";if(!state.pending)setStatus(web?"Card details entered at checkout. Press Pay online.":"Swipe the card to start a payment.")}
+$("merch").onchange=syncChannel;
+function syncToggles(){
+  $("tOff").setAttribute("aria-checked",state.offline); $("tFreeze").setAttribute("aria-checked",state.frozen);
+  $("cardstate").textContent=state.frozen?"Frozen":"Active";
+}
+$("tOff").onclick=()=>{ if(state.pending)return; state.offline=!state.offline; syncToggles(); renderPhone() };
+$("tFreeze").onclick=()=>{ state.frozen=!state.frozen; syncToggles() };
+$("pw").oninput=e=>{e.target.value=e.target.value.replace(/\D/g,"")};
+setInterval(()=>{$("clock").textContent=new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})},1000);
+$("clock").textContent=new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+</script>
+</body>
+</html>
